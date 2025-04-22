@@ -1,3 +1,36 @@
+// 🌍 多言語テキスト
+const texts = {
+  ja: {
+    timeUp: '🔔 タイムアップ！',
+    bellAlert: '🔔 ベルを鳴らすタイミング到達！',
+    unnamedSession: '無名セッション',
+    sessionEnd: '現在のセッション：終了！',
+    currentSession: '現在のセッション：',
+    start: '開始',
+    session: 'セッション',
+    eventTitle: 'イベント名',
+    placeholderSession: 'セッション名（例：発表）',
+    placeholderMin: '分',
+    placeholderSec: '秒'
+  },
+  en: {
+    timeUp: '🔔 Time\'s up!',
+    bellAlert: '🔔 Bell time reached!',
+    unnamedSession: 'Untitled Session',
+    sessionEnd: 'Current Session: Finished!',
+    currentSession: 'Current Session:',
+    start: 'Start',
+    session: 'Session',
+    eventTitle: 'Event Title',
+    placeholderSession: 'Session name (e.g., Presentation)',
+    placeholderMin: 'min',
+    placeholderSec: 'sec'
+  }
+};
+
+// HTML側で定義された lang に基づいて動作（例：const lang = "en";）
+
+
 const timeDisplay = document.getElementById('time-display');
 const startBtn = document.getElementById('start-btn');
 const pauseBtn = document.getElementById('pause-btn');
@@ -53,14 +86,14 @@ function addBellInput(min = '', sec = '') {
 
   const minInput = document.createElement('input');
   minInput.type = 'number';
-  minInput.placeholder = '分';
+  minInput.placeholder = texts[lang].placeholderMin;
   minInput.value = min;
   minInput.min = 0;
   minInput.max = 60;
 
   const secInput = document.createElement('input');
   secInput.type = 'number';
-  secInput.placeholder = '秒';
+  secInput.placeholder = texts[lang].placeholderSec;
   secInput.value = sec;
   secInput.min = 0;
   secInput.max = 59;
@@ -88,13 +121,13 @@ startBtn.addEventListener('click', () => {
     if (remainingSeconds <= 0) {
       clearInterval(intervalId);
       intervalId = null;
-      alert('🔔 タイムアップ！');
+      alert(texts[lang].timeUp);
     } else {
       remainingSeconds--;
       updateDisplay(remainingSeconds);
 
       if (bellTimes.includes(remainingSeconds)) {
-        console.log("🔔 ベルを鳴らすタイミング到達！");
+        console.log(texts[lang].bellAlert);
         bellSound.currentTime = 0;
         bellSound.play();
       }
@@ -129,7 +162,7 @@ applyTimeBtn.addEventListener('click', () => {
   customSessions = [];
   const rows = sessionList.querySelectorAll('.session-row');
   rows.forEach(row => {
-    const title = row.children[0].value || "無名セッション";
+    const title = row.children[0].value || texts[lang].unnamedSession;
     const min = Number(row.children[1].value || 0);
     const sec = Number(row.children[2].value || 0);
     const time = min * 60 + sec;
@@ -168,9 +201,9 @@ addSessionBtn.addEventListener('click', () => {
   row.style.margin = '10px';
 
   row.innerHTML = `
-    <input type="text" placeholder="セッション名（例：発表）">
-    <input type="number" min="0" max="60" placeholder="分" style="width: 60px;">
-    <input type="number" min="0" max="59" placeholder="秒" style="width: 60px;">
+    <input type="text" placeholder="${texts[lang].placeholderSession}">
+    <input type="number" min="0" max="60" placeholder="${texts[lang].placeholderMin}" style="width: 60px;">
+    <input type="number" min="0" max="59" placeholder="${texts[lang].placeholderSec}" style="width: 60px;">
     <button onclick="this.parentElement.remove()">🗑</button>
   `;
 
@@ -190,7 +223,7 @@ customStartBtn.addEventListener('click', () => {
   customSessions = [];
 
   rows.forEach(row => {
-    const title = row.children[0].value || "無名セッション";
+    const title = row.children[0].value || texts[lang].unnamedSession;
     const min = Number(row.children[1].value || 0);
     const sec = Number(row.children[2].value || 0);
     const time = min * 60 + sec;
@@ -208,7 +241,7 @@ customStartBtn.addEventListener('click', () => {
     if (customRemainingSeconds <= 0) {
       clearInterval(customIntervalId);
       customTimeDisplay.textContent = "00:00";
-      currentSessionDisplay.textContent = "現在のセッション：終了！";
+      currentSessionDisplay.textContent = texts[lang].sessionEnd;
     } else {
       customRemainingSeconds--;
       const m = String(Math.floor(customRemainingSeconds / 60)).padStart(2, '0');
@@ -218,22 +251,22 @@ customStartBtn.addEventListener('click', () => {
       const elapsed = customTotalSeconds - customRemainingSeconds;
       const current = popupSessions.slice().reverse().find(s => elapsed >= s.time);
       if (current) {
-        currentSessionDisplay.textContent = `現在のセッション：${current.title}`;
+        currentSessionDisplay.textContent = `${texts[lang].currentSession}${current.title}`;
       }
     }
   }, 1000);
 });
 
 confirmBtn.addEventListener('click', () => {
-  const eventTitle = document.getElementById('event-title').value || 'イベント名';
+  const eventTitle = document.getElementById('event-title').value || texts[lang].eventTitle;
   popupTitle.textContent = eventTitle;
 
   const rows = sessionList.querySelectorAll('.session-row');
-  const firstTitle = document.getElementById('first-session-title').value || "開始";
+  const firstTitle = document.getElementById('first-session-title').value || texts[lang].start;
 
   popupSessions = [{ title: firstTitle, time: 0 }];
   rows.forEach(row => {
-    const title = row.children[0].value || "セッション";
+    const title = row.children[0].value || texts[lang].session;
     const min = Number(row.children[1].value || 0);
     const sec = Number(row.children[2].value || 0);
     const time = min * 60 + sec;
@@ -253,7 +286,7 @@ confirmBtn.addEventListener('click', () => {
   popupRemainingSeconds = popupTotalSeconds;
 
   updatePopupDisplay(popupRemainingSeconds);
-  popupSession.textContent = "現在のセッション：";
+  popupSession.textContent = texts[lang].currentSession;
 
   popupTimerBox.style.display = 'block';
 });
@@ -267,7 +300,7 @@ popupStart.addEventListener('click', () => {
 
   const current = popupSessions.slice().reverse().find(s => 0 >= s.time);
   if (current) {
-    popupSession.textContent = `現在のセッション：${current.title}`;
+    popupSession.textContent = `${texts[lang].currentSession}${current.title}`;
     lastSession = current;
   }
 
@@ -276,7 +309,7 @@ popupStart.addEventListener('click', () => {
       clearInterval(popupTimerId);
       popupTimerId = null;
       popupTimeDisplay.textContent = "00:00";
-      popupSession.textContent = "現在のセッション：終了！";
+      popupSession.textContent = texts[lang].sessionEnd;
     } else {
       popupRemainingSeconds--;
       updatePopupDisplay(popupRemainingSeconds);
@@ -285,7 +318,7 @@ popupStart.addEventListener('click', () => {
       const current = popupSessions.slice().reverse().find(s => elapsed >= s.time);
 
       if (current && current !== lastSession) {
-        popupSession.textContent = `現在のセッション：${current.title}`;
+        popupSession.textContent = `${texts[lang].currentSession}${current.title}`;
         bellSound.currentTime = 0;
         bellSound.play();
         lastSession = current;
@@ -302,7 +335,7 @@ popupPause.addEventListener('click', () => {
 popupReset.addEventListener('click', () => {
   popupRemainingSeconds = popupTotalSeconds;
   updatePopupDisplay(popupRemainingSeconds);
-  popupSession.textContent = "現在のセッション：";
+  popupSession.textContent = texts[lang].currentSession;
   clearInterval(popupTimerId);
   popupTimerId = null;
 });

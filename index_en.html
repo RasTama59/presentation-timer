@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Presentation Timer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6672902671527712" crossorigin="anonymous"></script>
+  <script>const lang = "en";</script>
+  <style>
+    body { font-family: 'Noto Sans JP', sans-serif; text-align: center; margin-top: 100px; background: #fff; color: #222; }
+    button { font-size: 18px; padding: 10px 20px; margin: 10px; cursor: pointer; border-radius: 8px; border: 1px solid #bbb; background: #f7f7f7; transition: all 0.2s ease; }
+    button:hover { background: #eaeaea; box-shadow: 1px 1px 5px rgba(0,0,0,0.1); }
+    #time-display { font-size: 120px; margin-bottom: 30px; font-weight: bold; text-shadow: 1px 1px 4px rgba(0,0,0,0.1); }
+    .controls { margin-top: 30px; }
+    #popup { display: none; position: fixed; top: 30%; left: 50%; transform: translate(-50%, -30%); background: white; border: 1px solid #aaa; padding: 20px; box-shadow: 0 0 10px #ccc; }
+    #popup input[type="number"] { width: 60px; font-size: 18px; margin: 3px; }
+    .bell-time-row { display: flex; justify-content: center; align-items: center; margin: 5px 0; }
+    .bell-time-row input { width: 60px; margin-right: 5px; }
+    #custom-mode { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
+    #custom-mode h2 { margin-bottom: 20px; font-weight: 600; }
+    #custom-mode label, #custom-mode .time-inputs { display: block; margin: 15px 0; }
+    #custom-mode input[type="text"], #custom-mode input[type="number"] { font-size: 18px; padding: 8px; margin: 5px; }
+    .session-row { margin-bottom: 10px; display: flex; justify-content: center; align-items: center; }
+    .session-row input { margin-right: 5px; }
+    #custom-popup { display: none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: white; padding: 40px 30px; border: 1px solid #ccc; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); resize: both; overflow: auto; z-index: 9999; min-width: 300px; min-height: 300px; flex-direction: column; align-items: center; box-sizing: border-box; gap: 20px; border-radius: 12px; }
+    #popup-close-btn { position: absolute; top: 10px; right: 10px; font-size: 18px; background: #eee; border: none; padding: 5px 10px; cursor: pointer; border-radius: 6px; }
+    #popup-close-btn:hover { background-color: #ddd; }
+    #popup-time-display { font-size: 20vw !important; font-weight: bold; text-align: center; color: #111; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1); line-height: 1; margin: 30px 0; }
+    #popup-event-title { font-size: 3.5vw; font-weight: bold; color: #333; margin-bottom: 10px; text-align: center; }
+    #popup-current-session { font-size: 2.5vw; font-weight: 500; color: #444; margin-bottom: 15px; text-align: center; }
+    .popup-controls { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="simple-mode">
+    <div id="time-display">15:00</div>
+    <div class="controls">
+      <button id="start-btn">▶️ Start</button>
+      <button id="pause-btn">⏸️ Pause</button>
+      <button id="reset-btn">🔁 Reset</button>
+    </div>
+    <button id="simple-btn">SIMPLE</button>
+    <button id="custom-btn">CUSTOM</button>
+  </div>
+  <div id="popup">
+    <h3>Set bell times</h3>
+    Min: <input type="number" id="input-min" min="0" max="60" value="15">
+    Sec: <input type="number" id="input-sec" min="0" max="59" value="0"><br>
+    <div class="bell-times" id="bell-times">
+      <h4>Bell Triggers (Elapsed Time)</h4>
+    </div>
+    <button id="add-bell">＋ Add Time</button><br><br>
+    <button id="apply-time">Apply & Close</button>
+  </div>
+  <div id="custom-mode">
+    <h2>Custom Mode</h2>
+    <div id="current-session" style="font-size: 28px;"></div>
+    <button id="custom-confirm-btn">✅ Confirm</button>
+    <div class="time-inputs">
+      <label>Total time:
+        <input type="number" id="custom-total-min" placeholder="min" min="0" max="60">
+        <input type="number" id="custom-total-sec" placeholder="sec" min="0" max="59">
+      </label>
+    </div>
+    <label>Event title:
+      <input type="text" id="event-title" placeholder="e.g., AI Conference">
+    </label>
+    <label>First session name:
+      <input type="text" id="first-session-title" placeholder="e.g., Opening">
+    </label>
+    <div id="session-list">
+      <h4>Session List</h4>
+    </div>
+    <button id="add-session">＋ Add Session</button>
+    <button id="custom-start-btn" style="display: none;">▶️ Start Timer</button>
+  </div>
+  <div id="custom-popup">
+    <button id="popup-close-btn">✖</button>
+    <h2 id="popup-event-title">Event Title</h2>
+    <h3 id="popup-current-session">Current Session:</h3>
+    <div id="popup-time-display">00:00</div>
+    <div class="popup-controls">
+      <button id="popup-start-btn">▶️ Start</button>
+      <button id="popup-pause-btn">⏸️ Pause</button>
+      <button id="popup-reset-btn">🔁 Reset</button>
+    </div>
+  </div>
+  <audio id="bell-sound" src="bell.mp3" preload="auto"></audio>
+  <p><a href="privacy_en.html" target="_blank">Privacy Policy</a></p>
+  <script src="script.js"></script>
+</body>
+</html>
