@@ -33,6 +33,106 @@
     #popup-event-title { font-size: 3.5vw; font-weight: bold; color: #333; margin-bottom: 10px; text-align: center; }
     #popup-current-session { font-size: 2.5vw; font-weight: 500; color: #444; margin-bottom: 15px; text-align: center; }
     .popup-controls { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; }
+    .lang-switch {
+        position: fixed;
+        top: 10px;
+        left: 20px;
+        font-size: 14px;
+        z-index: 10000;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 6px 10px;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn {
+        margin: 0 4px;
+        text-decoration: none;
+        font-weight: bold;
+        color: #0077cc;
+        }
+
+        .lang-btn:hover {
+        text-decoration: underline;
+        color: #004488;
+        }
+
+        .ui-panel {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        background: rgba(255,255,255,0.95);
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-size: 14px;
+        z-index: 10000;
+        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+        text-align: left;
+        }
+
+        .ui-panel label {
+        display: block;
+        margin-bottom: 6px;
+        cursor: pointer;
+        }
+
+        .lang-switch-btm {
+        margin-top: 4px;
+        }
+
+        .lang-btn {
+        margin: 0 3px;
+        text-decoration: none;
+        font-weight: bold;
+        color: #0077cc;
+        }
+
+        .lang-btn:hover {
+        text-decoration: underline;
+        color: #004488;
+        }
+
+        
+        body.dark-mode {
+        background: #111 !important;
+        color: #fff !important;
+        }
+
+        body.dark-mode button,
+        body.dark-mode input {
+        background: #333 !important;
+        color: #fff !important;
+        border-color: #666 !important;
+        }
+
+        body.dark-mode #popup,
+        body.dark-mode #custom-popup,
+        body.dark-mode .ui-panel {
+        background: #222 !important;
+        color: #fff !important;
+        border-color: #444 !important;
+        }
+
+        body.dark-mode input::placeholder {
+        color: #ccc !important;
+        }
+
+        body.dark-mode #popup-time-display,
+        body.dark-mode #popup-event-title,
+        body.dark-mode #popup-current-session {
+        color: #fff !important;
+        }
+
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode div,
+        body.dark-mode span,
+        body.dark-mode label,
+        body.dark-mode p {
+        color: #fff !important;
+        }
+        
   </style>
 </head>
 <body>
@@ -89,6 +189,25 @@
       <button id="popup-reset-btn">🔁 Reset</button>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('theme-toggle');
+      
+      if (toggle) {
+        // 初期状態をセット
+        toggle.checked = document.body.classList.contains('dark-mode');
+        
+        toggle.addEventListener('change', (e) => {
+          if (e.target.checked) {
+            document.body.classList.add('dark-mode');
+          } else {
+            document.body.classList.remove('dark-mode');
+          }
+        });
+      }
+    });
+  </script>
   <audio id="bell-sound" src="bell.mp3" preload="auto"></audio>
   <p>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSdiYfTDcOHkGw8GuZpfrkPjqfvKqWSVbIse1bZZMxQ9TP-dLw/viewform?usp=dialog" target="_blank">
@@ -103,6 +222,19 @@
   <p style="font-size: 12px; text-align: center; margin-top: 20px;">
     <a href="privacy_en.html" target="_blank">Privacy Policy</a>
   </p>
+
+  <div class="ui-panel">
+    <label for="theme-toggle">
+      <input type="checkbox" id="theme-toggle" />
+      🌙 Dark-mode
+    </label>
+    <div class="lang-switch-btm">
+      <span>🌐 Language: </span>
+      <a href="index.html" class="lang-btn">日本語</a> |
+      <a href="index_en.html" class="lang-btn">English</a>
+    </div>
+  </div>
+  
   
   <script src="script.js"></script>
 </body>
