@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <meta charset="UTF-8">
+  <title>タイマーアプリ</title>
+  <style>
+    /* ベーススタイル */
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      text-align: center;
+      margin-top: 100px;
+      background: #fff;
+      color: #222;
+    }
+  
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: 1px solid #bbb;
+      background: #f7f7f7;
+      transition: all 0.2s ease;
+    }
+  
+    button:hover {
+      background: #eaeaea;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+    }
+  
+    /* SIMPLEモード */
+    #simple-mode {
+      display: block;
+    }
+  
+    #time-display {
+      font-size: 120px;
+      margin-bottom: 30px;
+      font-weight: bold;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    }
+  
+    .controls {
+      margin-top: 30px;
+    }
+  
+    #popup {
+      display: none;
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -30%);
+      background: white;
+      border: 1px solid #aaa;
+      padding: 20px;
+      box-shadow: 0 0 10px #ccc;
+    }
+  
+    #popup input[type="number"] {
+      width: 60px;
+      font-size: 18px;
+      margin: 3px;
+    }
+  
+    .bell-time-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 5px 0;
+    }
+  
+    .bell-time-row input {
+      width: 60px;
+      margin-right: 5px;
+    }
+  
+    /* CUSTOMモード */
+    #custom-mode {
+      display: none;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  
+    #custom-mode h2 {
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+  
+    #custom-mode label, #custom-mode .time-inputs {
+      display: block;
+      margin: 15px 0;
+    }
+  
+    #custom-mode input[type="text"],
+    #custom-mode input[type="number"] {
+      font-size: 18px;
+      padding: 8px;
+      margin: 5px;
+    }
+  
+    .session-row {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  
+    .session-row input {
+      margin-right: 5px;
+    }
+  
+    /* ポップアップ画面 */
+    #custom-popup {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 40px 30px;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      resize: both;
+      overflow: auto;
+      z-index: 9999;
+      min-width: 300px;
+      min-height: 300px;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+      gap: 20px;
+      border-radius: 12px;
+    }
+  
+    #popup-close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 18px;
+      background: #eee;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+  
+    #popup-close-btn:hover {
+      background-color: #ddd;
+    }
+  
+    /* タイマー・タイトル・セッション表示 */
+    #popup-time-display {
+      font-size: 20vw !important;
+      font-weight: bold;
+      text-align: center;
+      color: #111;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+      line-height: 1;
+      margin: 30px 0;
+    }
+  
+    #popup-event-title {
+      font-size: 3.5vw;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+  
+    #popup-current-session {
+      font-size: 2.5vw;
+      font-weight: 500;
+      color: #444;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+  
+    /* ボタンエリアの中央揃え */
+    .popup-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    body.dark-mode {
+  background: #111;
+  color: #fff;
+}
+
+body.dark-mode #custom-popup {
+  background: #222;
+  color: #fff;
+  border-color: #444;
+}
+
+body.dark-mode button {
+  background: #444;
+  color: #fff;
+  border-color: #666;
+}
+
+body.dark-mode button:hover {
+  background: #555;
+}
+
+body.dark-mode #popup-time-display {
+  color: #fff;
+}
+
+body.dark-mode #popup-event-title,
+body.dark-mode #popup-current-session {
+  color: #ddd;
+}
+
+body.dark-mode #popup-close-btn {
+  background: #444;
+  color: #fff;
+}
+
+body.dark-mode #popup-close-btn:hover {
+  background: #555;
+}
+
+  </style>
+  
+</head>
+<body>
+    <label style="position: fixed; top: 10px; right: 20px; font-size: 16px; z-index: 10000;">
+        <input type="checkbox" id="theme-toggle" />
+        🌙 ダークモード
+      </label>
+      
+  <!-- SIMPLEモード全体 -->
+  <div id="simple-mode">
+    <div id="time-display">15:00</div>
+    <div class="controls">
+      <button id="start-btn">▶️ 開始</button>
+      <button id="pause-btn">⏸️ 一時停止</button>
+      <button id="reset-btn">🔁 リセット</button>
+    </div>
+    <button id="simple-btn">SIMPLE</button>
+    <button id="custom-btn">CUSTOM</button>
+  </div>
+
+  <!-- SIMPLEポップアップ -->
+  <div id="popup">
+    <h3>ベルを鳴らす時間を設定</h3>
+    分：<input type="number" id="input-min" min="0" max="60" value="15">
+    秒：<input type="number" id="input-sec" min="0" max="59" value="0"><br>
+    <div class="bell-times" id="bell-times">
+      <h4>ベルを鳴らすタイミング（開始からの経過時間）</h4>
+    </div>
+    <button id="add-bell">＋ 時間追加</button><br><br>
+    <button id="apply-time">反映して閉じる</button>
+  </div>
+
+  <!-- CUSTOMモード全体 -->
+  <div id="custom-mode">
+    <h2>カスタムモード</h2>
+    <div id="current-session" style="font-size: 28px;"></div>
+
+    <button id="custom-confirm-btn">✅ 決定</button>
+
+    <div class="time-inputs">
+      <label>全体の時間：
+        <input type="number" id="custom-total-min" placeholder="分" min="0" max="60">
+        <input type="number" id="custom-total-sec" placeholder="秒" min="0" max="59">
+      </label>
+    </div>
+
+    <label>イベント名：
+      <input type="text" id="event-title" placeholder="〇〇学会 口頭発表セッション">
+    </label>
+
+    <label>最初のセッション名：
+      <input type="text" id="first-session-title" placeholder="例：開始">
+    </label>
+
+    <div id="session-list">
+      <h4>セッション一覧</h4>
+    </div>
+
+    <button id="add-session">＋ セッション追加</button>
+    <button id="custom-start-btn" style="display: none;">▶️ タイマー開始</button>
+  </div>
+
+  <!-- CUSTOMモードの実行ポップアップ -->
+  <div id="custom-popup">
+    <button id="popup-close-btn">✖</button>
+    <h2 id="popup-event-title">イベント名</h2>
+    <h3 id="popup-current-session">現在のセッション：</h3>
+    <div id="popup-time-display" style="font-size: 8vw; margin: 30px 0;">00:00</div>
+    <div class="popup-controls">
+      <button id="popup-start-btn">▶️ 開始</button>
+      <button id="popup-pause-btn">⏸️ 一時停止</button>
+      <button id="popup-reset-btn">🔁 リセット</button>
+    </div>
+  </div>
+
+  <audio id="bell-sound" src="bell.mp3" preload="auto"></audio>
+  <script>
+    const toggle = document.getElementById('theme-toggle');
+    toggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode', toggle.checked);
+    });
+  </script>
+  <p><a href="https://docs.google.com/forms/d/e/1FAIpQLSdiYfTDcOHkGw8GuZpfrkPjqfvKqWSVbIse1bZZMxQ9TP-dLw/viewform?usp=dialog" target="_blank">ご意見・ご要望はこちら</a></p>
+
+  <p style="font-size: 12px; color: #888; text-align: center; margin-top: 40px;">
+    ※本サイトは <a href="https://otologic.jp" target="_blank">OtoLogic</a> の音素材を使用しています。
+  </p>
+  
+  <script src="script.js"></script>
+</body>
+</html>
